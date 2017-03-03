@@ -31,7 +31,7 @@ struct file_buf {
 	char buffer[MAX_FILE_BUFFER+1];
 	int head;
 	int tail;
-	int occ;
+	int occ;	//set as flag to signal the 
 	FILE *fd;
 };
 
