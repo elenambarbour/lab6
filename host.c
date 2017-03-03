@@ -31,7 +31,7 @@ struct file_buf {
 	char buffer[MAX_FILE_BUFFER+1];
 	int head;
 	int tail;
-	int occ;	//set as flag to signal the 
+	int occ;	//acts for number of jobs in the queue
 	FILE *fd;
 };
 
@@ -41,8 +41,9 @@ struct file_buf {
  */
 
 /* Initialize file buffer data structure */
-void file_buf_init(struct file_buf *f)
+void file_buf_init(struct file_buf *f)	//file buffer struct pointer
 {
+/* set members of file_buf as initial values */
 f->head = 0;
 f->tail = MAX_FILE_BUFFER;
 f->occ = 0;
@@ -50,8 +51,8 @@ f->name_length = 0;
 }
 
 /* 
- * Get the file name in the file buffer and store it in name 
- * Terminate the string in name with tne null character
+ * Get the file name from the file buffer and store it in name member 
+ * Terminate the string in name with the null character
  */
 void file_buf_get_name(struct file_buf *f, char name[])
 {
@@ -60,7 +61,8 @@ int i;
 for (i=0; i<f->name_length; i++) {
 	name[i] = f->name[i];
 }
-name[f->name_length] = '\0';
+name[f->name_length] = '\0';	//since name_length has the length, it will return an integer value
+				//one greater than the index of the last character
 }
 
 /*
@@ -85,10 +87,10 @@ int file_buf_add(struct file_buf *f, char string[], int length)
 int i = 0;
 
 while (i < length && f->occ < MAX_FILE_BUFFER) {
-	f->tail = (f->tail + 1) % (MAX_FILE_BUFFER + 1);
-	f->buffer[f->tail] = string[i];
+	f->tail = (f->tail + 1) % (MAX_FILE_BUFFER + 1);	//finds out where the tail will end up
+	f->buffer[f->tail] = string[i];				//pushes the string indices into the buffer, starting from the tail
 	i++;
-        f->occ++;
+        f->occ++;						//still not sure what occ means in this case?
 }
 return(i);
 }
@@ -102,13 +104,13 @@ int file_buf_remove(struct file_buf *f, char string[], int length)
 int i = 0;
 
 while (i < length && f->occ > 0) {
-	string[i] = f->buffer[f->head];
-	f->head = (f->head + 1) % (MAX_FILE_BUFFER + 1);
+	string[i] = f->buffer[f->head];				//start head first so not backwards
+	f->head = (f->head + 1) % (MAX_FILE_BUFFER + 1);	//move head forward to point at next character
 	i++;
-        f->occ--;
+        f->occ--;						//maybe occupancy of file_buffer? Actual integer value
 }
 
-return(i);
+return(i);							//return the length of the string
 }
 
 
