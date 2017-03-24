@@ -457,10 +457,17 @@ else {
 	g_net_node =(struct net_node*) malloc(sizeof(struct net_node)*node_num);
 	for (i=0; i<node_num; i++) { 
 		fscanf(fp, " %c ", &node_type);
-
+		printf("Node type is: %c\n", node_type); 
 		if (node_type = 'H') {
 			fscanf(fp, " %d ", &node_id);
 			g_net_node[i].type = HOST;
+			g_net_node[i].id = node_id;
+		}
+//stopping point ->this breaks the code
+		else if (node_type = 'S') {
+			fscanf(fp, " %d ", &node_id);
+			printf("it's a switch: %d\n", node_id); 
+			g_net_node[i].type = SWITCH;
 			g_net_node[i].id = node_id;
 		}
 		else {
