@@ -27,7 +27,7 @@
 #define MAX_FILE_NAME 100
 #define PKT_PAYLOAD_MAX 100
 #define TENMILLISEC 10000   /* 10 millisecond sleep */
-
+#define MAX_TABLE_SIZE 100 //size of the forwarding table -jess
 /* Types of packets */
 
 struct file_buf {
@@ -212,12 +212,12 @@ int job_q_num(struct job_queue *j_q)
 {
 return j_q->occ;
 }
-
+//start off with the same main as host (no need anything before) -jess
 /*
  *  Main 
  */
 
-void host_main(int host_id)
+void switch_main(int switch_id)// change host_id to switch_id -jess
 {
 
 /* State */
@@ -227,7 +227,8 @@ int dir_valid = 0;
 char man_msg[MAN_MSG_LENGTH];
 char man_reply_msg[MAN_MSG_LENGTH];
 char man_cmd;
-struct man_port_at_host *man_port;  // Port to the manager
+//struct man_port_at_host *man_port;  // Port to the manager
+//^^don't need that anymore -jess
 
 struct net_port *node_port_list;
 struct net_port **node_port;  // Array of pointers to node ports

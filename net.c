@@ -464,7 +464,7 @@ else {
 			g_net_node[i].id = node_id;
 		}
 //stopping point ->this breaks the code
-		else if (node_type = 'S') {
+		else if (node_type == 'S') {
 			fscanf(fp, " %d ", &node_id);
 			printf("it's a switch: %d\n", node_id); 
 			g_net_node[i].type = SWITCH;
