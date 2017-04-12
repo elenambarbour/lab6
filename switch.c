@@ -27,207 +27,35 @@
 #define MAX_FILE_NAME 100
 #define PKT_PAYLOAD_MAX 100
 #define TENMILLISEC 10000   /* 10 millisecond sleep */
+#define MAX_TABLE_SIZE 100 //size of the forwarding table -jess
 
-/* Types of packets */
+//start off with the same main as host (no need anything before) -jess
+// just add the struct for the forwarding table
 
-struct file_buf {
-	char name[MAX_FILE_NAME];
-	int name_length;
-	char buffer[MAX_FILE_BUFFER+1];
-	int head;
-	int tail;
-	int occ;	//acts for number of jobs in the queue
-	FILE *fd;
+struct switch_table_format { // struct setup for switch table-jess
+	int valid_status;
+	char dest;
+	int port_num;
 };
 
-
-/*
- * File buffer operations
- */
-
-/* Initialize file buffer data structure */
-void file_buf_init(struct file_buf *f)	//file buffer struct pointer
-{
-/* set members of file_buf as initial values */
-f->head = 0;
-f->tail = MAX_FILE_BUFFER;
-f->occ = 0;
-f->name_length = 0;
-}
-
-/* 
- * Get the file name from the file buffer and store it in name member 
- * Terminate the string in name with the null character
- */
-void file_buf_get_name(struct file_buf *f, char name[])
-{
-int i;
-
-for (i=0; i<f->name_length; i++) {
-	name[i] = f->name[i];
-}
-name[f->name_length] = '\0';	//since name_length has the length, it will return an integer value
-				//one greater than the index of the last character
-}
-
-/*
- *  Put name[] into the file name in the file buffer
- *  length = the length of name[]
- */
-void file_buf_put_name(struct file_buf *f, char name[], int length)
-{
-int i;
-
-for (i=0; i<length; i++) {
-	f->name[i] = name[i];
-}
-f->name_length = length;
-}
-
-/*
- *  Add 'length' bytes n string[] to the file buffer
- */
-int file_buf_add(struct file_buf *f, char string[], int length)
-{
-int i = 0;
-
-while (i < length && f->occ < MAX_FILE_BUFFER) {
-	f->tail = (f->tail + 1) % (MAX_FILE_BUFFER + 1);	//finds out where the tail will end up
-	f->buffer[f->tail] = string[i];				//pushes the string indices into the buffer, starting from the tail
-	i++;
-        f->occ++;						//still not sure what occ means in this case?
-}
-return(i);
-}
-
-/*
- *  Remove bytes from the file buffer and store it in string[] 
- *  The number of bytes is length.
- */
-int file_buf_remove(struct file_buf *f, char string[], int length)
-{
-int i = 0;
-
-while (i < length && f->occ > 0) {
-	string[i] = f->buffer[f->head];				//start head first so not backwards
-	f->head = (f->head + 1) % (MAX_FILE_BUFFER + 1);	//move head forward to point at next character
-	i++;
-        f->occ--;						//maybe occupancy of file_buffer? Actual integer value
-}
-
-return(i);							//return the length of the string
-}
-
-
-/*
- * Operations with the manager
- */
-
-int get_man_command(struct man_port_at_host *port, char msg[], char *c) {
-
-int n;
-int i;
-int k;
-
-n = read(port->recv_fd, msg, MAN_MSG_LENGTH); /* Get command from manager */
-if (n>0) {  /* Remove the first char from "msg" */
-	for (i=0; msg[i]==' ' && i<n; i++);
-	*c = msg[i];
-	i++;
-	for (; msg[i]==' ' && i<n; i++);
-	for (k=0; k+i<n; k++) {
-		msg[k] = msg[k+i];
-	}
-	msg[k] = '\0';
-}
-return n;
-
-}
-
-/*
- * Operations requested by the manager
- */
-
-/* Send back state of the host to the manager as a text message */
-void reply_display_host_state(
-		struct man_port_at_host *port,
-		char dir[],
-		int dir_valid,
-		int host_id)
-{
-int n;
-char reply_msg[MAX_MSG_LENGTH];
-
-if (dir_valid == 1) {
-	n =sprintf(reply_msg, "%s %d", dir, host_id);
-}
-else {
-	n = sprintf(reply_msg, "None %d", host_id);
-}
-
-write(port->send_fd, reply_msg, n);
-}
-
-
-
-/* Job queue operations */
-
-/* Add a job to the job queue */
-void job_q_add(struct job_queue *j_q, struct host_job *j)
-{
-if (j_q->head == NULL ) {
-	j_q->head = j;
-	j_q->tail = j;
-	j_q->occ = 1;
-}
-else {
-	(j_q->tail)->next = j;
-	j->next = NULL;
-	j_q->tail = j;
-	j_q->occ++;
-}
-}
-
-/* Remove job from the job queue, and return pointer to the job*/
-struct host_job *job_q_remove(struct job_queue *j_q)
-{
-struct host_job *j;
-
-if (j_q->occ == 0) return(NULL);
-j = j_q->head;
-j_q->head = (j_q->head)->next;
-j_q->occ--;
-return(j);
-}
-
-/* Initialize job queue */
-void job_q_init(struct job_queue *j_q)
-{
-j_q->occ = 0;
-j_q->head = NULL;
-j_q->tail = NULL;
-}
-
-int job_q_num(struct job_queue *j_q)
-{
-return j_q->occ;
-}
-
+struct switch_table_format forward_Table[MAX_TABLE_SIZE]; 
+//^^create a array of the struct "switch_table_format" -jess
 /*
  *  Main 
  */
 
-void host_main(int host_id)
+void switch_main(int switch_id)// change host_id to switch_id -jess
 {
 
-/* State */
+/* State */ //keep all this stuff? -jess
 char dir[MAX_DIR_NAME];
 int dir_valid = 0;
 
 char man_msg[MAN_MSG_LENGTH];
 char man_reply_msg[MAN_MSG_LENGTH];
 char man_cmd;
-struct man_port_at_host *man_port;  // Port to the manager
+//struct man_port_at_host *man_port;  // Port to the manager
+//^^don't need that anymore -jess
 
 struct net_port *node_port_list;
 struct net_port **node_port;  // Array of pointers to node ports
@@ -251,24 +79,25 @@ struct host_job *new_job2;
 
 struct job_queue job_q;
 
+/* //take out all of the file buffer stuff cuz it's for the host - jess
 struct file_buf f_buf_upload;  
 struct file_buf f_buf_download; 
 
 file_buf_init(&f_buf_upload);
 file_buf_init(&f_buf_download);
 
-/*
+/* //get ride of this too I think cuz it will just use once it gets to the right host? - jess
  * Initialize pipes 
  * Get link port to the manager
  */
 
 man_port = net_get_host_port(host_id);
-
+*/
 /*
  * Create an array node_port[ ] to store the network link ports
  * at the host.  The number of ports is node_port_num
  */
-node_port_list = net_get_port_list(host_id);
+node_port_list = net_get_port_list(host_id); //hold on to this -jess
 
 	/*  Count the number of network link ports */
 node_port_num = 0;
