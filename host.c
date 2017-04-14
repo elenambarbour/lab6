@@ -176,6 +176,7 @@ if (j_q->head == NULL ) {
 	j_q->head = j;
 	j_q->tail = j;
 	j_q->occ = 1;
+	j->next = NULL;
 }
 else {
 	(j_q->tail)->next = j;
@@ -477,7 +478,7 @@ while(1) {
 				write(man_port->send_fd, man_reply_msg, n+1);
 				free(new_job);
 			}
-			else if (new_job->ping_timer > 1) {
+			else if (new_job->ping_timer > -100) {
 				new_job->ping_timer--;
 				job_q_add(&job_q, new_job);
 			}

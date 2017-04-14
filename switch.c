@@ -5,7 +5,7 @@
 // Description: This file is a type of host that acts as a switch 
 //              to redirect messages to the proper destination
 //		similar to a router
-
+// adding a test line
 
 #include <stdio.h>
 #include <stdlib.h>
