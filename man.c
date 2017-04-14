@@ -14,6 +14,7 @@
 #include "man.h"
 #include "net.h"
 #include "host.h"
+#include "switch.h"
 
 #define MAXBUFFER 1000
 #define PIPE_WRITE 1 

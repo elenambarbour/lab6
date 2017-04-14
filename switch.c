@@ -168,18 +168,75 @@ while(1) {
 
 		/* Get a new job from the job queue */
 		new_job = job_q_remove(&job_q);
+		int temp_port = -1; 
+		int j = 0; 
+	
+		//check if the source is in the table (else, add it to the table as a possible destination) -jess
+		while (j < MAX_TABLE_SIZE){
+			if (forwardTable[j].valid_status==1){
+				printf("Status of table entry %d is valid!\n", j);
+				if (forwardTable[j].dest == new_job->packet->src){
+					printf("Status of table entry destination: %d == the source!\n", j);
+					temp_port = forwardTable[j].port_num;
+					j = MAX_TABLE_SIZE; //	exit the loop
+				}
+			}
+			j++; //iterate through the table
+		}
+		
+		if (temp_port ==-1){ //it wasn't found, so add the source to list of known ports ->hosts
+			j=0;//reset
+			while (j < MAX_TABLE_SIZE){
+				if(forwardTable[j].valid_status==0){
+					forwardTable[j].valid_status = 1; 
+					forwardTable[j].dest = new_job->packet->src; 
+					forwardTable[j].port_num = new_job->in_port_index;
+					j = MAX_TABLE_SIZE; //exit the loop
+				}
+				j++; //iterate through the table
+			}
+		}
+
 
 		
-		//check if the source is in the table (else, add it to the table as a possible destination) -jess
-	
 		//check if the destination matches a table destination -jess
-			//if true -- send it 
-			// else -- send it on blast
+		temp_port = -1; //reset
+		j = 0; 			
+			
+		//if true -- send it	 
+		while(j < MAX_TABLE_SIZE){
+			if(forwardTable[j].valid_status ==1){
+				printf("Found a valid entry at %d \n",j);
+				if(forwardTable[j].dest == new_job->packet->dst){
+					printf("Found port  at %d \n",temp_port);
+					temp_port = forwardTable[j].port_num; 
+					j= MAX_TABLE_SIZE; //exit the loop
+				}
+			}
+			j++; //iterate through the loop
+		}
+
+		if (temp_port >=0){
+			printf("Sending on port %d\n", temp_port);
+			packet_send(node_port[temp_port], new_job->packet);
+		}	
+		
+		else {		/// else -- send it on blast
+			int m=0;//reset
+			printf("Blasting out packet\n");
+			while( m < node_port_num){
+				if(m != new_job->in_port_index){//don't send to the incoming port
+					printf("Sending packet on port %d\n",m);
+					packet_send(node_port[m], new_job->packet);
+				}
+				m++; 
+			}
+
+		}//end of if job_q_num
 
 
-
-
-	}//end of if job_q_num
+		free(new_job->packet); //keep from host.c
+		free(new_job); 
 
 	/* The host goes to sleep for 10 ms */
 	usleep(TENMILLISEC);
@@ -187,7 +244,7 @@ while(1) {
 } /* End of while loop */
 
 }
-
+}
 
 
 
