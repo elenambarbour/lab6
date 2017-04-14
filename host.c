@@ -170,18 +170,19 @@ void reply_display_host_state(
 /* Add a job to the job queue */
 void job_q_add(struct job_queue *j_q, struct host_job *j)
 {
-    if (j_q->head == NULL ) {
-        j->next = NULL;
-        j_q->head = j;
-        j_q->tail = j;
-        j_q->occ = 1;
-    }
-    else {
-        (j_q->tail)->next = j;
-        j->next = NULL;
-        j_q->tail = j;
-        j_q->occ++;
-    }
+  if (j_q->head == NULL ) {
+	  j_q->head = j;
+	  j_q->tail = j;
+	  j_q->occ = 1;
+	  j->next = NULL;
+  }
+  else {
+    (j_q->tail)->next = j;
+    j->next = NULL;
+    j_q->tail = j;
+    j_q->occ++;
+  }
+
 }
 
 /* Remove job from the job queue, and return pointer to the job*/
@@ -733,8 +734,3 @@ void host_main(int host_id)
     } /* End of while loop */
 
 }
-
-
-
-
-
