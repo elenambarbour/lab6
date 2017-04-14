@@ -44,7 +44,8 @@ struct switch_table_format { // struct setup for switch table-jess
 
 void switch_main(int switch_id)// change host_id to switch_id -jess
 {
-
+printf("---starting switch----\n");
+//int temp_port = forwardTable[j].port_num; 
 struct switch_table_format forwardTable[MAX_TABLE_SIZE];
 //^^create a array of the struct "switch_table_format" -jess
 
@@ -176,24 +177,28 @@ while(1) {
 			if (forwardTable[j].valid_status==1){
 				printf("Status of table entry %d is valid!\n", j);
 				if (forwardTable[j].dest == new_job->packet->src){
-					printf("Status of table entry destination: %d == the source!\n", j);
 					temp_port = forwardTable[j].port_num;
 					j = MAX_TABLE_SIZE; //	exit the loop
+					printf("Status of table entry %d is valid and the source is at port %d\n", j, temp_port);
 				}
 			}
 			j++; //iterate through the table
+			printf("Leaving source checker. J is :%d\n", j); 
 		}
 		
 		if (temp_port ==-1){ //it wasn't found, so add the source to list of known ports ->hosts
 			j=0;//reset
 			while (j < MAX_TABLE_SIZE){
 				if(forwardTable[j].valid_status==0){
+					char c_temp = new_job->packet->src;
+					printf("Storing entry for port %d and host %c at entry %d in the table\n", new_job->in_port_index, c_temp, j);
 					forwardTable[j].valid_status = 1; 
 					forwardTable[j].dest = new_job->packet->src; 
 					forwardTable[j].port_num = new_job->in_port_index;
 					j = MAX_TABLE_SIZE; //exit the loop
 				}
-				j++; //iterate through the table
+				j++; //iterate through the tabl
+				printf("Leaving source setter loop. J is :%d\n", j); 
 			}
 		}
 
@@ -206,18 +211,20 @@ while(1) {
 		//if true -- send it	 
 		while(j < MAX_TABLE_SIZE){
 			if(forwardTable[j].valid_status ==1){
-				printf("Found a valid entry at %d \n",j);
+				printf("Found a valid entry at %d place in the dest table checker\n",j);
 				if(forwardTable[j].dest == new_job->packet->dst){
-					printf("Found port  at %d \n",temp_port);
 					temp_port = forwardTable[j].port_num; 
+					printf("Found port %d at entry %d\n",temp_port, j);
 					j= MAX_TABLE_SIZE; //exit the loop
 				}
 			}
 			j++; //iterate through the loop
+			printf("Leaving destination checker. J is :%d\n", j); 
+
 		}
 
 		if (temp_port >=0){
-			printf("Sending on port %d\n", temp_port);
+			printf("Sending on port found in the destination table:%d\n", temp_port);
 			packet_send(node_port[temp_port], new_job->packet);
 		}	
 		
