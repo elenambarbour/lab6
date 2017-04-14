@@ -11,7 +11,7 @@
 #include "net.h"
 #include "man.h"
 #include "host.h"
-
+#include "switch.h"
 
 void main()
 {
@@ -47,7 +47,7 @@ void main()
             }
             else if (p_node->type = SWITCH) {
                 /* Execute switch routine, which you have to write */
-               // switch_main(p_node->id); 
+                switch_main(p_node->id); 
             }
             return;
         }  
@@ -65,8 +65,3 @@ void main()
      */
     kill(0, SIGKILL); /* Kill all processes */
 }
-
-
-
-
-
