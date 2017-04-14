@@ -9,6 +9,7 @@ enum host_job_type {
 	JOB_PING_WAIT_FOR_REPLY,
 	JOB_FILE_UPLOAD_SEND,
 	JOB_FILE_UPLOAD_RECV_START,
+    JOB_FILE_UPLOAD_RECV_IN, // Added this line
 	JOB_FILE_UPLOAD_RECV_END
 };
 
@@ -32,5 +33,6 @@ struct job_queue {
 };
 
 void host_main(int host_id);
+
 
 
