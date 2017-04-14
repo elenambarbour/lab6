@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -45,7 +43,7 @@ void main()
             if (p_node->type == HOST) {  /* Execute host routine */
                 host_main(p_node->id);
             }
-            else if (p_node->type = SWITCH) {
+            else if (p_node->type == SWITCH) {
                 /* Execute switch routine, which you have to write */
                 switch_main(p_node->id); 
             }
